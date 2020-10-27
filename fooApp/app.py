@@ -13,13 +13,14 @@ from flask_login import login_required
 #import dnspython
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'enydM2ANhdcoKwdVa0jWvEsbPFuQpMjf' # Create your own.
-app.config['SESSION_PROTECTION'] = 'strong'
+
 
 name="Pepelui"
 password="8cf7oXB5rUa145KT"
 url="cluster0.llup4.mongodb.net"
-mongo = PyMongo(app, uri="mongodb+srv://{}:{}@{}/fooApp".format(name,password,url))
+app.config['MONGO_DBNAME'] = "fooApp"
+app.config['MONGO_URI'] =  f"mongodb://{name}:{password}@{url}.mlab.com:57066/fooApp"
+mongo = PyMongo(app)
 
 # Use Flask-Login to track current user in Flask's session.
 login_manager = LoginManager()
