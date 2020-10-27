@@ -13,14 +13,13 @@ from flask_login import login_required
 #import dnspython
 
 app = Flask(__name__)
-
+app.config['SECRET_KEY'] = 'enydM2ANhdcoKwdVa0jWvEsbPFuQpMjf' # Create your own.
+app.config['SESSION_PROTECTION'] = 'strong'
 
 name="Pepelui"
 password="8cf7oXB5rUa145KT"
 url="cluster0.llup4.mongodb.net"
-app.config['MONGO_DBNAME'] = "fooApp"
-app.config['MONGO_URI'] =  f"mongodb://{name}:{password}@{url}.mlab.com:57066/fooApp"
-mongo = PyMongo(app)
+mongo = PyMongo(app, uri="mongodb+srv://{}:{}@{}/fooApp".format(name,password,url))
 
 # Use Flask-Login to track current user in Flask's session.
 login_manager = LoginManager()
@@ -43,17 +42,20 @@ def index():
   return redirect(url_for('products_list'))
 
 
-@app.route('/products/create/', methods=['GET', 'POST'])
+@app.route("/products/create/", methods=["GET", "POST"])
 @login_required
 def product_create():
-  """Provide HTML form to create a new product."""
-  form = ProductForm(request.form)
-  if request.method == 'POST' and form.validate():
-    mongo.db.products.insert_one(form.data)
-    # Success. Send user back to full product list.
-    return redirect(url_for('products_list'))
-  # Either first load or validation error at this point.
-  return render_template('product/edit.html', form=form)
+    """Provide HTML form to create a new product."""
+    form = ProductForm(request.form)
+    if request.method == "POST" and form.validate():
+        mongo.db.products.insert_one(form.data)
+        # Success. Send user back to full product list.
+        return redirect(url_for("products_list"))
+    # Either first load or validation error at this point.
+    return render_template(
+        "product/edit.html", title="Create a new Product", form=form, product=dict()
+    )
+
 
 @app.route('/products/<product_id>/')
 def product_detail(product_id):
